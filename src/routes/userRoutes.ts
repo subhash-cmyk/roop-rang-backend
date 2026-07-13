@@ -1,0 +1,11 @@
+import { Router } from 'express';
+import * as uc from '../controllers/userController';
+import { protect } from '../middlewares/authMiddleware';
+const router = Router();
+router.use(protect);
+router.get('/', uc.getUsers);
+router.get('/:id', uc.getUser);
+router.post('/', uc.createUser);
+router.put('/:id', uc.updateUser);
+router.delete('/:id', uc.deleteUser);
+export default router;

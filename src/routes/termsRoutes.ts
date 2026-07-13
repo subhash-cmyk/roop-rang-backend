@@ -1,0 +1,10 @@
+import { Router } from 'express';
+import * as t from '../controllers/termsController';
+import { protect } from '../middlewares/authMiddleware';
+const router = Router();
+router.get('/', t.getTerms);
+router.get('/all', protect, t.listTerms);
+router.post('/', protect, t.createTerms);
+router.put('/:id', protect, t.updateTerms);
+router.delete('/:id', protect, t.deleteTerms);
+export default router;

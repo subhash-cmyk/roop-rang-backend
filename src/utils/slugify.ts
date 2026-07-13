@@ -1,0 +1,2 @@
+export const slugify = (text:string): string => text.toString().toLowerCase().trim().replace(/\s+/g,'-').replace(/[^\w\-]+/g,'').replace(/\-\-+/g,'-').replace(/^-+/,'').replace(/-+$/,'');
+export const generateSKU = (name:string): string => { const prefix=name.substring(0,3).toUpperCase().replace(/[^A-Z]/g,'R'); const random=Math.floor(10000+Math.random()*90000); return `RR-${prefix}-${random}`; };

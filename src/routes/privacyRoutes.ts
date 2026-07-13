@@ -1,0 +1,10 @@
+import { Router } from 'express';
+import * as p from '../controllers/privacyController';
+import { protect } from '../middlewares/authMiddleware';
+const router = Router();
+router.get('/', p.getPrivacy);
+router.get('/all', protect, p.listPrivacy);
+router.post('/', protect, p.createPrivacy);
+router.put('/:id', protect, p.updatePrivacy);
+router.delete('/:id', protect, p.deletePrivacy);
+export default router;
