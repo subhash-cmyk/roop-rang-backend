@@ -25,9 +25,11 @@ import uploadRoutes from './routes/uploadRoutes';
 import dashboardRoutes from './routes/dashboardRoutes';
 import heroRoutes from "./routes/heroRoutes";
 import heroUploadRoutes from "./routes/heroUploadRoutes";
+import visitorRoutes from "./routes/visitorRoutes";
 
 const app = express();
 app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
+app.use("/api/visitor",visitorRoutes);
 app.use(compression());
 app.use(morgan('dev'));
 app.use(cookieParser());
