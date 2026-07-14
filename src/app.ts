@@ -23,6 +23,9 @@ import termsRoutes from './routes/termsRoutes';
 import settingsRoutes from './routes/settingsRoutes';
 import uploadRoutes from './routes/uploadRoutes';
 import dashboardRoutes from './routes/dashboardRoutes';
+import heroRoutes from "./routes/heroRoutes";
+import heroUploadRoutes from "./routes/heroUploadRoutes";
+
 const app = express();
 app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
 app.use(compression());
@@ -63,6 +66,8 @@ app.use('/api/terms', termsRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/hero', heroRoutes);
+app.use('/api/upload/hero', heroUploadRoutes);
 app.use(notFound);
 app.use(errorHandler);
 export default app;

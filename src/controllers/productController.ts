@@ -132,12 +132,25 @@ export const getOfferProducts = async (_req: Request, res: Response) => {
       discount: { gt: 0 },
     },
     take: 12,
+    orderBy: {
+      createdAt: 'desc',
+    },
     include: {
-      images: { take: 1 },
+      images: {
+        orderBy: {
+          sortOrder: 'asc',
+        },
+        take: 1,
+      },
       category: true,
     },
   })
 
+  res.json({
+    success: true,
+    data: products,
+  })
+  
   res.json({ success: true, data: products })
 }
 
@@ -250,6 +263,7 @@ export const updateProduct = async (req: Request, res: Response) => {
   }
 
   const data: any = { ...req.body }
+  delete data.existingImages // Remove existingImages from data if present
 
   if (data.name) {
     data.slug = `${slugify(data.name)}-${Date.now().toString().slice(-5)}`
@@ -260,9 +274,19 @@ export const updateProduct = async (req: Request, res: Response) => {
   if (data.discount !== undefined) data.discount = Number(data.discount)
   if (data.stock !== undefined) data.stock = Number(data.stock)
 
-  if (data.categoryId !== undefined) {
-  data.categoryId = Number(data.categoryId)
+let categoryUpdate = {}
+
+if (data.categoryId !== undefined) {
+  categoryUpdate = {
+    category: {
+      connect: {
+        id: Number(data.categoryId)
+      }
+    }
   }
+
+  delete data.categoryId
+}
 
   if (typeof data.isFeatured === 'string') {
     data.isFeatured = data.isFeatured === 'true'
@@ -273,11 +297,13 @@ export const updateProduct = async (req: Request, res: Response) => {
   if (typeof data.isOffer === 'string') {
     data.isOffer = data.isOffer === 'true'
   }
-
-  const product = await prisma.product.update({
-    where: { id },
-    data,
-  })
+const product = await prisma.product.update({
+  where: { id },
+  data: {
+    ...data,
+    ...categoryUpdate
+  },
+})
 
   const files = req.files as Express.Multer.File[] | undefined
 

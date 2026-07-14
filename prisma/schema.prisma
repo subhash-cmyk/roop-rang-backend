@@ -190,6 +190,14 @@ model WebsiteSetting {
   updatedAt       DateTime @updatedAt
   @@map("website_settings")
 }
+model HeroBanner {
+  id        Int      @id @default(autoincrement())
+  image     String
+  badgeText String?
+  title     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
 enum Role {
   SUPER_ADMIN
   ADMIN

@@ -5,8 +5,9 @@ import fs from 'fs'
 const productsDir = path.join(process.cwd(), 'uploads/products')
 const categoriesDir = path.join(process.cwd(), 'uploads/categories')
 const offersDir = path.join(process.cwd(), 'uploads/offers')
+const heroDir = path.join(process.cwd(), 'uploads/hero')
 
-for (const dir of [productsDir, categoriesDir, offersDir]) {
+for (const dir of [productsDir, categoriesDir, offersDir, heroDir]) {
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true })
   }
@@ -62,6 +63,15 @@ const offerUpload = multer({
     files: 1,
   },
 })
+const heroUpload = multer({
+  storage: makeStorage(heroDir),
+  fileFilter,
+  limits: {
+    fileSize: 5 * 1024 * 1024,
+    files: 1,
+  },
+})
+
 
 // product page ke liye
 export const uploadProductImages = productUpload
@@ -71,6 +81,8 @@ export const uploadCategoryImage = categoryUpload
 
 // offer page ke liye
 export const uploadOfferImage = offerUpload
+// hero page ke liye
+export const uploadHeroImage = heroUpload
 
 // uploadRoutes.ts ke liye generic exports
 export const uploadSingle = productUpload.single('image')
