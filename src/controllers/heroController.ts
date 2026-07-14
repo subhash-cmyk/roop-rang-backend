@@ -1,20 +1,6 @@
 import { Request, Response } from "express";
 import prisma from "../config/prisma";
 
-
-export const deleteHero = async (
-  req: Request,
-  res: Response
-) => {
-  await prisma.heroBanner.deleteMany();
-
-  res.json({
-    success: true,
-    message: "Hero Banner deleted"
-  });
-};
-
-
 export const getHero = async(
  req:Request,
  res:Response
@@ -29,30 +15,43 @@ export const getHero = async(
 
 
 export const updateHero = async (
- req: Request,
- res: Response
+  req: Request,
+  res: Response
 ) => {
+  try {
+    const { image, badgeText, title } = req.body;
 
- try {
+    const existingHero = await prisma.heroBanner.findFirst();
 
- const {image,badgeText,title}=req.body;
+    let hero;
 
- await prisma.heroBanner.deleteMany();
+    if (existingHero) {
+      hero = await prisma.heroBanner.update({
+        where: {
+          id: existingHero.id,
+        },
+        data: {
+          image,
+          badgeText,
+          title,
+        },
+      });
+    } else {
+      hero = await prisma.heroBanner.create({
+        data: {
+          image,
+          badgeText,
+          title,
+        },
+      });
+    }
 
- const hero = await prisma.heroBanner.create({
-   data:{
-    image,
-    badgeText,
-    title
-   }
- });
+    res.json(hero);
+  } catch (error) {
+    console.error(error);
 
- res.json(hero);
-
- } catch(error){
-   res.status(500).json({
-     message:"Hero update failed"
-   });
- }
-
+    res.status(500).json({
+      message: "Hero update failed",
+    });
+  }
 };
