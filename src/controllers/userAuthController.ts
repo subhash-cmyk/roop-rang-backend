@@ -61,28 +61,28 @@ export const register = async (req: Request, res: Response) => {
       password: hashedPassword,
     },
   });
+const otp = generateOTP();
+console.log("Generated OTP:", otp);
+console.log("User Email:", user.email);
+await prisma.emailOTP.deleteMany({
+  where: {
+    email: user.email,
+  },
+});
 
-  const otp = generateOTP();
+await prisma.emailOTP.create({
+  data: {
+    email: user.email,
+    otp,
+    expiresAt: new Date(Date.now() + 10 * 60 * 1000),
+  },
+});
 
-  await prisma.emailOTP.deleteMany({
-    where: {
-      email: user.email,
-    },
-  });
-
-  await prisma.emailOTP.create({
-    data: {
-      email: user.email,
-      otp,
-      expiresAt: new Date(Date.now() + 10 * 60 * 1000),
-    },
-  });
-
-  await sendVerificationEmail(
-    user.email,
-    user.name,
-    otp
-  );
+await sendVerificationEmail(
+  user.email,
+  user.name,
+  otp
+);
 
   return res.status(201).json({
     success: true,
@@ -115,12 +115,40 @@ export const register = async (req: Request, res: Response) => {
       });
     }
 
-    if (!user.isVerified) {
-      return res.status(401).json({
-        success: false,
-        message: "Please verify your email first.",
-      });
-    }
+   if (!user.isVerified) {
+
+  const otp = generateOTP();
+
+  await prisma.emailOTP.deleteMany({
+    where: {
+      email: user.email,
+    },
+  });
+
+
+  await prisma.emailOTP.create({
+    data: {
+      email: user.email,
+      otp,
+      expiresAt: new Date(
+        Date.now() + 10 * 60 * 1000
+      ),
+    },
+  });
+
+
+  await sendVerificationEmail(
+    user.email,
+    user.name,
+    otp
+  );
+
+
+  return res.status(401).json({
+    success: false,
+    message: "Please verify your email first.",
+  });
+}
 
     const match = await bcrypt.compare(
       password,
@@ -158,6 +186,7 @@ export const register = async (req: Request, res: Response) => {
       },
     });
   };
+  
 
   // ================= LOGOUT =================
 
@@ -372,3 +401,172 @@ export const register = async (req: Request, res: Response) => {
       message: "OTP sent successfully.",
     });
   };
+
+  // ============== FORGOT PASSWORD =================
+export const forgotPassword = async (
+  req: Request,
+  res: Response
+) => {
+
+  const { email } = req.body;
+
+  const user = await prisma.user.findUnique({
+    where: { email }
+  });
+
+
+  if (!user) {
+    return res.status(404).json({
+      success:false,
+      message:"Email not registered"
+    });
+  }
+
+
+  const otp = generateOTP();
+
+
+  await prisma.emailOTP.deleteMany({
+    where:{
+      email
+    }
+  });
+
+
+  await prisma.emailOTP.create({
+    data:{
+      email,
+      otp,
+      expiresAt:new Date(
+        Date.now() + 10 * 60 * 1000
+      )
+    }
+  });
+
+
+  await sendVerificationEmail(
+    user.email,
+    user.name,
+    otp
+  );
+
+
+  res.json({
+    success:true,
+    message:"Reset OTP sent to email",
+    email
+  });
+
+};
+
+// ============== VERIFY RESET OTP =================
+
+export const verifyResetOTP = async (
+  req: Request,
+  res: Response
+) => {
+
+  const { email, otp } = req.body;
+
+
+  const record = await prisma.emailOTP.findFirst({
+    where: {
+      email,
+      otp,
+    },
+  });
+
+
+  if (!record) {
+
+    return res.status(400).json({
+      success: false,
+      message: "Invalid OTP",
+    });
+
+  }
+
+
+  if (record.expiresAt < new Date()) {
+
+    return res.status(400).json({
+      success: false,
+      message: "OTP has expired",
+    });
+
+  }
+
+
+  return res.json({
+    success: true,
+    message: "OTP verified successfully",
+  });
+
+};
+
+// ============== RESET PASSWORD =================
+
+export const resetPassword = async (
+  req: Request,
+  res: Response
+) => {
+
+  const {
+    email,
+    password,
+  } = req.body;
+
+
+  if (!email || !password) {
+    return res.status(400).json({
+      success: false,
+      message: "Email and password are required",
+    });
+  }
+
+
+  const user = await prisma.user.findUnique({
+    where: {
+      email,
+    },
+  });
+
+
+  if (!user) {
+    return res.status(404).json({
+      success: false,
+      message: "User not found",
+    });
+  }
+
+
+  const hashedPassword = await bcrypt.hash(
+    password,
+    12
+  );
+
+
+  await prisma.user.update({
+  where: {
+    email,
+  },
+  data: {
+    password: hashedPassword,
+  },
+});
+
+
+  // remove old OTP
+  await prisma.emailOTP.deleteMany({
+    where: {
+      email,
+    },
+  });
+
+
+  return res.json({
+    success: true,
+    message: "Password reset successfully",
+  });
+
+};

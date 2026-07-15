@@ -11,7 +11,7 @@ export const registerSchema = z
   .object({
     name: z.string().min(2).max(100),
     email: z.string().email(),
-    phone: z.string().regex(/^[6-9]\d{9}$/, "Mobile number must be exactly 10 digits"),
+    phone: z.string().regex(/^[6-9]\d{9}$/, "Please enter a valid Indian mobile number"),
     password: z.string().min(6).max(100),
     confirmPassword: z.string().min(6).max(100),
   })
