@@ -17,7 +17,6 @@ import productRoutes from './routes/productRoutes';
 import offerRoutes from './routes/offerRoutes';
 import inquiryRoutes from './routes/inquiryRoutes';
 import contactRoutes from './routes/contactRoutes';
-//import supportRoutes from './routes/supportRoutes';
 import privacyRoutes from './routes/privacyRoutes';
 import termsRoutes from './routes/termsRoutes';
 import settingsRoutes from './routes/settingsRoutes';
@@ -26,6 +25,7 @@ import dashboardRoutes from './routes/dashboardRoutes';
 import heroRoutes from "./routes/heroRoutes";
 import heroUploadRoutes from "./routes/heroUploadRoutes";
 import visitorRoutes from "./routes/visitorRoutes";
+import userAuthRoutes from "./routes/userAuthRoutes";
 
 const app = express();
 app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
@@ -51,18 +51,14 @@ app.get('/', (_req, res) => {
 });
 
 app.use('/api/admin', authRoutes);
-
-//app.get('/health', (_req,res)=> res.json({ status:'ok', service:'Roop Rang API', timestamp:new Date().toISOString() }));
-//app.get('/api', (_req,res)=> res.json({ message:'Roop Rang Cosmetics API v1.0', docs:'/api-docs' }));
-//app.use('/api/admin', authRoutes);
 app.use('/api/auth', authRoutes);
+app.use("/api/user", userAuthRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/offers', offerRoutes);
 app.use('/api/inquiry', inquiryRoutes);
 app.use('/api/contact', contactRoutes);
-//app.use('/api/support', supportRoutes);
 app.use('/api/privacy-policy', privacyRoutes);
 app.use('/api/terms', termsRoutes);
 app.use('/api/settings', settingsRoutes);

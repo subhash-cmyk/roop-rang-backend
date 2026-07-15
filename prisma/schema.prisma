@@ -27,10 +27,21 @@ model User {
   status    Status   @default(ACTIVE)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  isVerified  Boolean  @default(false)
   inquiries Inquiry[]
   supports  SupportTicket[]
   @@map("users")
 }
+model EmailOTP {
+  id         Int      @id @default(autoincrement())
+  email      String
+  otp        String
+  expiresAt  DateTime
+  verified   Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  @@index([email])
+}
+
 model Category {
   id          Int       @id @default(autoincrement())
   name        String    @db.VarChar(100)
