@@ -150,8 +150,6 @@ export const getOfferProducts = async (_req: Request, res: Response) => {
     success: true,
     data: products,
   })
-  
-  res.json({ success: true, data: products })
 }
 
 export const getProductsByCategory = async (req: Request, res: Response) => {
@@ -351,3 +349,4 @@ export const deleteProduct = async (req: Request, res: Response) => {
     message: 'Product deleted',
   })
 }
+

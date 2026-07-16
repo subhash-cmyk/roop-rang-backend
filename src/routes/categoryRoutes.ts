@@ -1,14 +1,39 @@
-import { Router } from 'express'
-import * as cc from '../controllers/categoryController'
-import { protect } from '../middlewares/authMiddleware'
-import { uploadCategoryImage } from '../middlewares/uploadMiddleware'
+import { Router } from "express";
+import multer from "multer";
 
-const router = Router()
+import {
+  getCategories,
+  adminListCategories,
+  getCategoryById,
+  createCategory,
+  updateCategory,
+  deleteCategory,
+} from "../controllers/categoryController";
 
-router.get('/', cc.getCategories)
-router.get('/:id', cc.getCategoryById)
-router.post('/', protect, uploadCategoryImage.single('image'), cc.createCategory)
-router.put('/:id', protect, uploadCategoryImage.single('image'), cc.updateCategory)
-router.delete('/:id', protect, cc.deleteCategory)
+const router = Router();
 
-export default router
+// Multer
+const upload = multer({
+  dest: "uploads/categories",
+});
+
+// ================= Public =================
+
+// Pagination + Search (Admin List)
+router.get("/", adminListCategories);
+
+// Category by ID
+router.get("/:id", getCategoryById);
+
+// ================= Admin =================
+
+// Create
+router.post("/", upload.single("image"), createCategory);
+
+// Update
+router.put("/:id", upload.single("image"), updateCategory);
+
+// Delete
+router.delete("/:id", deleteCategory);
+
+export default router;
