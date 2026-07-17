@@ -22,10 +22,12 @@ export const getCategories = async (_req: Request, res: Response) => {
       success: true,
       data: categories,
     });
-  } catch (error) {
+  } catch (error: any) {
+    console.error(error);
+
     res.status(500).json({
       success: false,
-      message: "Failed to load categories",
+      message: error.message,
     });
   }
 };
@@ -55,6 +57,13 @@ export const adminListCategories = async (
         take: limit,
         orderBy: {
           createdAt: "desc",
+        },
+        include: {
+          _count: {
+            select: {
+              products: true,
+            },
+          },
         },
       }),
 

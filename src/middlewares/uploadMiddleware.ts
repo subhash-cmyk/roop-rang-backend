@@ -41,7 +41,7 @@ const productUpload = multer({
   storage: makeStorage(productsDir),
   fileFilter,
   limits: {
-    fileSize: 5 * 1024 * 1024,
+    fileSize: 15 * 1024 * 1024, // 15 MB
     files: 10,
   },
 })
@@ -50,7 +50,7 @@ const categoryUpload = multer({
   storage: makeStorage(categoriesDir),
   fileFilter,
   limits: {
-    fileSize: 5 * 1024 * 1024,
+    fileSize: 15 * 1024 * 1024, // 15 MB
     files: 1,
   },
 })
@@ -59,7 +59,7 @@ const offerUpload = multer({
   storage: makeStorage(offersDir),
   fileFilter,
   limits: {
-    fileSize: 5 * 1024 * 1024,
+     fileSize: 15 * 1024 * 1024, // 15 MB
     files: 1,
   },
 })
@@ -67,7 +67,7 @@ const heroUpload = multer({
   storage: makeStorage(heroDir),
   fileFilter,
   limits: {
-    fileSize: 5 * 1024 * 1024,
+    fileSize: 15 * 1024 * 1024, // 15 MB
     files: 1,
   },
 })

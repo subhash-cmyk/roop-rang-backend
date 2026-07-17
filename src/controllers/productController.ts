@@ -207,17 +207,17 @@ export const createProduct = async (req: Request, res: Response) => {
   const sku = data.sku || generateSKU(data.name)
 
   const product = await prisma.product.create({
- data: {
-  ...data,
-  slug,
-  sku,
-  categoryId: Number(data.categoryId),
-  mrp: Number(data.mrp),
-  sellingPrice: Number(data.sellingPrice),
-  discount: data.discount ? Number(data.discount) : 0,
-  stock: data.stock ? Number(data.stock) : 0,
+  data: {
+    ...data,
+    slug,
+    sku,
+    categoryId: Number(data.categoryId),
+    mrp: Number(data.mrp),
+    sellingPrice: Number(data.sellingPrice),
+    discount: data.discount ? Number(data.discount) : 0,
+    stock: data.stock ? Number(data.stock) : 0,
   },
-  })
+})
 
   const files = req.files as Express.Multer.File[] | undefined
 
@@ -261,30 +261,32 @@ export const updateProduct = async (req: Request, res: Response) => {
   }
 
   const data: any = { ...req.body }
+  data.description = data.description || null
+  data.ingredients = data.ingredients || null
+  data.howToUse = data.howToUse || null
   delete data.existingImages // Remove existingImages from data if present
 
   if (data.name) {
     data.slug = `${slugify(data.name)}-${Date.now().toString().slice(-5)}`
   }
-
   if (data.mrp !== undefined) data.mrp = Number(data.mrp)
   if (data.sellingPrice !== undefined) data.sellingPrice = Number(data.sellingPrice)
   if (data.discount !== undefined) data.discount = Number(data.discount)
   if (data.stock !== undefined) data.stock = Number(data.stock)
 
-let categoryUpdate = {}
+  let categoryUpdate = {}
 
-if (data.categoryId !== undefined) {
-  categoryUpdate = {
-    category: {
-      connect: {
-        id: Number(data.categoryId)
+  if (data.categoryId !== undefined) {
+    categoryUpdate = {
+      category: {
+        connect: {
+          id: Number(data.categoryId)
+        }
       }
     }
-  }
 
-  delete data.categoryId
-}
+    delete data.categoryId
+  }
 
   if (typeof data.isFeatured === 'string') {
     data.isFeatured = data.isFeatured === 'true'
@@ -295,13 +297,13 @@ if (data.categoryId !== undefined) {
   if (typeof data.isOffer === 'string') {
     data.isOffer = data.isOffer === 'true'
   }
-const product = await prisma.product.update({
-  where: { id },
-  data: {
-    ...data,
-    ...categoryUpdate
-  },
-})
+  const product = await prisma.product.update({
+    where: { id },
+    data: {
+      ...data,
+      ...categoryUpdate,
+    },
+  })
 
   const files = req.files as Express.Multer.File[] | undefined
 

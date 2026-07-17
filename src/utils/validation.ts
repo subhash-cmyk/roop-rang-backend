@@ -30,18 +30,30 @@ export const userLoginSchema = z.object({
 export const productSchema = z.object({
   name: z.string().min(2).max(200),
   brand: z.string().optional(),
+
   description: z.string().min(10),
+
+  // NEW
+  ingredients: z.string().optional(),
+  howToUse: z.string().optional(),
+
   shortDesc: z.string().max(300).optional(),
+
   mrp: z.coerce.number().positive(),
   sellingPrice: z.coerce.number().positive(),
   discount: z.coerce.number().min(0).max(100).default(0),
   stock: z.coerce.number().int().min(0).default(0),
+
   categoryId: z.coerce.number().int().positive(),
+
   sku: z.string().optional(),
+
   isFeatured: z.coerce.boolean().optional(),
   isNewArrival: z.coerce.boolean().optional(),
   isBestSeller: z.coerce.boolean().optional(),
+
   status: z.enum(['ACTIVE', 'INACTIVE']).optional(),
+
   seoTitle: z.string().optional(),
   seoDescription: z.string().optional(),
 });
