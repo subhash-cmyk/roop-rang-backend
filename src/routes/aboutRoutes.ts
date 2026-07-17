@@ -4,20 +4,19 @@ import { protect, authorize } from "../middlewares/authMiddleware";
 
 const router = Router();
 
-router.get("/", getAbout);
+router.get("/", getAbout); // Public
 
 router.post(
   "/",
   protect,
-  authorize("ADMIN"),
+  authorize("SUPER_ADMIN"),
   saveAbout
 );
 
 router.put(
   "/",
   protect,
-  authorize("ADMIN"),
+  authorize("SUPER_ADMIN"),
   saveAbout
 );
-
 export default router;

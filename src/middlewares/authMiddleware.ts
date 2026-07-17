@@ -70,7 +70,6 @@ export const authorize = (...roles:string[]) => {
     res: Response,
     next: NextFunction
   ) => {
-
     if(!req.admin || !roles.includes(req.admin.role)){
       return res.status(403).json({
         success:false,
