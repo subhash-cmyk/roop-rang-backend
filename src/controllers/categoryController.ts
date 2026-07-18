@@ -39,7 +39,7 @@ export const adminListCategories = async (
 ) => {
   try {
     const page = Number(req.query.page) || 1;
-    const limit = Number(req.query.limit) || 10;
+    const limit = Number(req.query.limit) || 100;
     const search = String(req.query.search || "");
 
     const where: any = {};
