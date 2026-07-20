@@ -40,6 +40,9 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use('/api/', rateLimit({ windowMs:15*60*1000, max:300 }));
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.get("/api-docs-json", (_req, res) => {
+  res.json(swaggerSpec);
+});
 app.get('/health', (_req,res)=> res.json({ status:'ok', service:'Roop Rang API', timestamp:new Date().toISOString() }));
 
 app.get('/api', (_req,res)=> res.json({ message:'Roop Rang Cosmetics API v1.0', docs:'/api-docs' }));
