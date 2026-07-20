@@ -124,33 +124,24 @@ export const getNewArrivals = async (_req: Request, res: Response) => {
   res.json({ success: true, data: products })
 }
 
+
+
 export const getOfferProducts = async (_req: Request, res: Response) => {
   const products = await prisma.product.findMany({
     where: {
       isOffer: true,
       status: 'ACTIVE',
-      discount: { gt: 0 },
     },
-    take: 12,
-    orderBy: {
-      createdAt: 'desc',
-    },
+    take: 8,
+    orderBy: { createdAt: 'desc' },
     include: {
-      images: {
-        orderBy: {
-          sortOrder: 'asc',
-        },
-        take: 1,
-      },
+      images: { take: 1 },
       category: true,
     },
-  })
+  });
 
-  res.json({
-    success: true,
-    data: products,
-  })
-}
+  res.json({ success: true, data: products });
+};
 
 export const getProductsByCategory = async (req: Request, res: Response) => {
   const { slug } = req.params
