@@ -27,8 +27,13 @@ import heroRoutes from "./routes/heroRoutes";
 import heroUploadRoutes from "./routes/heroUploadRoutes";
 import visitorRoutes from "./routes/visitorRoutes";
 import userAuthRoutes from "./routes/userAuthRoutes";
+import testimonialRoutes from "./routes/testimonialRoutes";
 
 const app = express();
+app.use(
+  "/uploads",
+  express.static(path.join(process.cwd(), "uploads"))
+);
 app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
 app.use("/api/visitor",visitorRoutes);
 app.use(compression());
@@ -71,6 +76,7 @@ app.use('/api/upload', uploadRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/hero', heroRoutes);
 app.use('/api/upload/hero', heroUploadRoutes);
+app.use('/api/testimonials', testimonialRoutes);
 app.use(notFound);
 app.use(errorHandler);
 export default app;

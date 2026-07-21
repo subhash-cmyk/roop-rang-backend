@@ -231,14 +231,9 @@ model About {
 
 model Testimonial {
   id          Int      @id @default(autoincrement())
-  name        String
-  designation String?
-  city        String?
   review      String   @db.Text
   rating      Int      @default(5)
-  image        String?
   isActive    Boolean  @default(true)
-  displayOrder Int     @default(0)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

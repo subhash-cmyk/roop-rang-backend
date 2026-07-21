@@ -6,8 +6,9 @@ const productsDir = path.join(process.cwd(), 'uploads/products')
 const categoriesDir = path.join(process.cwd(), 'uploads/categories')
 const offersDir = path.join(process.cwd(), 'uploads/offers')
 const heroDir = path.join(process.cwd(), 'uploads/hero')
+const testimonialsDir = path.join(process.cwd(), 'uploads/testimonials')
 
-for (const dir of [productsDir, categoriesDir, offersDir, heroDir]) {
+for (const dir of [productsDir, categoriesDir, offersDir, heroDir, testimonialsDir]) {
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true })
   }
@@ -71,6 +72,16 @@ const heroUpload = multer({
     files: 1,
   },
 })
+const testimonialUpload = multer({
+  storage: makeStorage(testimonialsDir),
+  fileFilter,
+  limits: {
+    fileSize: 15 * 1024 * 1024,
+    files: 1,
+  },
+})
+
+export const uploadTestimonialImage = testimonialUpload
 
 
 // product page ke liye
