@@ -36,6 +36,15 @@ export const getOffers = async (req: Request, res: Response) => {
       orderBy: {
         createdAt: "desc",
       },
+      include: {
+        products: {
+          select: {
+            id: true,
+            name: true,
+            slug: true,
+          },
+        },
+      },
     }),
 
     prisma.offer.count({ where }),
@@ -58,6 +67,15 @@ export const getOfferById = async (req: Request, res: Response) => {
   const offer = await prisma.offer.findUnique({
     where: {
       id: Number(req.params.id),
+    },
+    include: {
+      products: {
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+        },
+      },
     },
   });
 
@@ -97,6 +115,8 @@ export const createOffer = async (req: Request, res: Response) => {
   const slug =
     slugify(data.name) + "-" + Date.now().toString().slice(-4);
 
+  const productIds = Array.from(new Set(data.productIds || []));
+
   const offer = await prisma.offer.create({
     data: {
       name: data.name,
@@ -108,6 +128,20 @@ export const createOffer = async (req: Request, res: Response) => {
       endDate: new Date(data.endDate),
       status: data.status || "ACTIVE",
       bannerImage,
+      ...(productIds.length > 0 && {
+        products: {
+          connect: productIds.map((id) => ({ id })),
+        },
+      }),
+    },
+    include: {
+      products: {
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+        },
+      },
     },
   });
 
@@ -143,11 +177,42 @@ export const updateOffer = async (req: Request, res: Response) => {
     data.status = data.status.toUpperCase();
   }
 
+  let productIds: number[] | undefined;
+  if (data.productIds !== undefined) {
+    let raw = data.productIds;
+    if (typeof raw === "string") {
+      try {
+        raw = JSON.parse(raw);
+      } catch (e) {
+        raw = raw.split(",").map((n: string) => Number(n.trim()));
+      }
+    }
+    if (Array.isArray(raw)) {
+      productIds = Array.from(new Set(raw.map(Number).filter((n) => !isNaN(n) && n > 0)));
+    }
+    delete data.productIds;
+  }
+
+  if (productIds !== undefined) {
+    data.products = {
+      set: productIds.map((id) => ({ id })),
+    };
+  }
+
   const offer = await prisma.offer.update({
     where: {
       id: Number(req.params.id),
     },
     data,
+    include: {
+      products: {
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+        },
+      },
+    },
   });
 
   res.json({

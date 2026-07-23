@@ -83,6 +83,7 @@ model Product {
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
   images         ProductImage[]
+  offers         Offer[]
   @@index([categoryId])
   @@index([slug])
   @@map("products")
@@ -110,6 +111,7 @@ model Offer {
   status      Status   @default(ACTIVE)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  products    Product[]
   @@map("offers")
 }
 model Inquiry {

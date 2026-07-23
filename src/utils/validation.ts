@@ -87,6 +87,21 @@ export const offerSchema = z.object({
   startDate: z.string().or(z.date()),
   endDate: z.string().or(z.date()),
   status: z.enum(['ACTIVE', 'INACTIVE']).optional(),
+  productIds: z.preprocess((val) => {
+    if (typeof val === 'string') {
+      try {
+        const parsed = JSON.parse(val);
+        if (Array.isArray(parsed)) return parsed.map(Number).filter(n => !isNaN(n));
+      } catch (e) {
+        if (val.trim() === '') return [];
+        return val.split(',').map(n => Number(n.trim())).filter(n => !isNaN(n));
+      }
+    }
+    if (Array.isArray(val)) {
+      return val.map(Number).filter(n => !isNaN(n));
+    }
+    return val;
+  }, z.array(z.number().int().positive()).optional().default([])),
 });
 
 // ================= USERS =================

@@ -9,6 +9,7 @@ export const getProducts = async (req: Request, res: Response) => {
   const skip = (page - 1) * limit
   const search = (req.query.search as string) || ''
   const category = req.query.category as string
+  const offerId = req.query.offerId || req.query.offer
   const sort = (req.query.sort as string) || 'newest'
 
   const where: any = { status: 'ACTIVE' }
@@ -23,6 +24,14 @@ export const getProducts = async (req: Request, res: Response) => {
 
   if (category) {
     where.category = { slug: category }
+  }
+
+  if (offerId) {
+    where.offers = {
+      some: {
+        id: Number(offerId),
+      },
+    }
   }
 
   let orderBy: any = { createdAt: 'desc' }
@@ -41,6 +50,9 @@ export const getProducts = async (req: Request, res: Response) => {
         images: {
           orderBy: { sortOrder: 'asc' },
           take: 1,
+        },
+        offers: {
+          select: { id: true, name: true, slug: true, discount: true, discountType: true },
         },
       },
     }),
@@ -67,6 +79,9 @@ export const getProductById = async (req: Request, res: Response) => {
     include: {
       category: true,
       images: { orderBy: { sortOrder: 'asc' } },
+      offers: {
+        select: { id: true, name: true, slug: true, discount: true, discountType: true },
+      },
     },
   })
 
@@ -101,6 +116,7 @@ export const getFeaturedProducts = async (_req: Request, res: Response) => {
     include: {
       images: { take: 1 },
       category: true,
+      offers: { select: { id: true, name: true, slug: true, discount: true, discountType: true } },
     },
   })
 
@@ -118,6 +134,7 @@ export const getNewArrivals = async (_req: Request, res: Response) => {
     include: {
       images: { take: 1 },
       category: true,
+      offers: { select: { id: true, name: true, slug: true, discount: true, discountType: true } },
     },
   })
 
@@ -126,7 +143,31 @@ export const getNewArrivals = async (_req: Request, res: Response) => {
 
 
 
-export const getOfferProducts = async (_req: Request, res: Response) => {
+export const getOfferProducts = async (req: Request, res: Response) => {
+  const offerId = req.query.offerId ? Number(req.query.offerId) : undefined;
+
+  if (offerId) {
+    const offer = await prisma.offer.findUnique({
+      where: { id: offerId },
+      include: {
+        products: {
+          where: { status: 'ACTIVE' },
+          take: 8,
+          orderBy: { createdAt: 'desc' },
+          include: {
+            images: { take: 1 },
+            category: true,
+            offers: { select: { id: true, name: true, slug: true, discount: true, discountType: true } },
+          },
+        },
+      },
+    });
+
+    if (offer && offer.products && offer.products.length > 0) {
+      return res.json({ success: true, data: offer.products });
+    }
+  }
+
   const products = await prisma.product.findMany({
     where: {
       isOffer: true,
@@ -137,6 +178,7 @@ export const getOfferProducts = async (_req: Request, res: Response) => {
     include: {
       images: { take: 1 },
       category: true,
+      offers: { select: { id: true, name: true, slug: true, discount: true, discountType: true } },
     },
   });
 
@@ -154,6 +196,7 @@ export const getProductsByCategory = async (req: Request, res: Response) => {
     include: {
       images: { take: 1 },
       category: true,
+      offers: { select: { id: true, name: true, slug: true, discount: true, discountType: true } },
     },
     take: 24,
   })
@@ -167,6 +210,9 @@ export const getProductBySlug = async (req: Request, res: Response) => {
     include: {
       category: true,
       images: { orderBy: { sortOrder: 'asc' } },
+      offers: {
+        select: { id: true, name: true, slug: true, discount: true, discountType: true },
+      },
     },
   })
 
